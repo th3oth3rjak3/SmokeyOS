@@ -16,6 +16,6 @@ pkgs.mkShell {
   shellHook = ''
     export CROSS_PREFIX=i686-elf-
     export ARCH=i686
-    echo "Bare-metal OS dev ready!"
+    echo "SmokeyOS dev ready!"
   '';
 }
