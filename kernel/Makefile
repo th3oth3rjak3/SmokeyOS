@@ -5,13 +5,14 @@ HOSTARCH!=../target-triplet-to-arch.sh $(HOST)
 CFLAGS?=-O2 -g
 CPPFLAGS?=
 LDFLAGS?=
-LIBS?=
+LIBS?= -L$(SYSROOT)/usr/lib
 
 DESTDIR?=
 PREFIX?=/usr/local
 EXEC_PREFIX?=$(PREFIX)
 BOOTDIR?=$(EXEC_PREFIX)/boot
 INCLUDEDIR?=$(PREFIX)/include
+
 
 CFLAGS:=$(CFLAGS) -ffreestanding -Wall -Wextra
 CPPFLAGS:=$(CPPFLAGS) -D__is_kernel -Iinclude
@@ -50,11 +51,11 @@ $(ARCHDIR)/crtn.o \
 .PHONY: all clean install install-headers install-kernel
 .SUFFIXES: .o .c .S
 
-all: myos.kernel
+all: smokeyos.kernel
 
-myos.kernel: $(OBJS) $(ARCHDIR)/linker.ld
+smokeyos.kernel: $(OBJS) $(ARCHDIR)/linker.ld
 	$(CC) -T $(ARCHDIR)/linker.ld -o $@ $(CFLAGS) $(LINK_LIST)
-	grub-file --is-x86-multiboot myos.kernel
+	grub-file --is-x86-multiboot smokeyos.kernel
 
 $(ARCHDIR)/crtbegin.o $(ARCHDIR)/crtend.o:
 	OBJ=`$(CC) $(CFLAGS) $(LDFLAGS) -print-file-name=$(@F)` && cp "$$OBJ" $@
@@ -66,7 +67,7 @@ $(ARCHDIR)/crtbegin.o $(ARCHDIR)/crtend.o:
 	$(CC) -MD -c $< -o $@ $(CFLAGS) $(CPPFLAGS)
 
 clean:
-	rm -f myos.kernel
+	rm -f smokeyos.kernel
 	rm -f $(OBJS) *.o */*.o */*/*.o
 	rm -f $(OBJS:.o=.d) *.d */*.d */*/*.d
 
@@ -76,8 +77,8 @@ install-headers:
 	mkdir -p $(DESTDIR)$(INCLUDEDIR)
 	cp -R --preserve=timestamps include/. $(DESTDIR)$(INCLUDEDIR)/.
 
-install-kernel: myos.kernel
+install-kernel: smokeyos.kernel
 	mkdir -p $(DESTDIR)$(BOOTDIR)
-	cp myos.kernel $(DESTDIR)$(BOOTDIR)
+	cp smokeyos.kernel $(DESTDIR)$(BOOTDIR)
 
 -include $(OBJS:.o=.d)
